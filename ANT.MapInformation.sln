@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2003
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ANT.MapInformation.Dapper", "ANT.MapInformation\ANT.MapInformation.Dapper.csproj", "{46BB754D-F96A-40A7-8E30-2569C872DEDB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ANT.MapInformation.WebAPI", "ANT.MapInformation.WebAPI\ANT.MapInformation.WebAPI.csproj", "{7F3A213E-31A2-44A5-9F7B-C57E719A865A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{46BB754D-F96A-40A7-8E30-2569C872DEDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46BB754D-F96A-40A7-8E30-2569C872DEDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46BB754D-F96A-40A7-8E30-2569C872DEDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46BB754D-F96A-40A7-8E30-2569C872DEDB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F3A213E-31A2-44A5-9F7B-C57E719A865A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F3A213E-31A2-44A5-9F7B-C57E719A865A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F3A213E-31A2-44A5-9F7B-C57E719A865A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F3A213E-31A2-44A5-9F7B-C57E719A865A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {17D2E331-579B-45B6-9BDF-6F3477803BE9}
+	EndGlobalSection
+EndGlobal
