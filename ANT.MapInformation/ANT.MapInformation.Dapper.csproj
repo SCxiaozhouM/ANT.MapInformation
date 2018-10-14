@@ -49,10 +49,11 @@
   <ItemGroup>
     <Compile Include="DapperHelper.cs" />
     <Compile Include="Entity\Authentication.cs" />
+    <Compile Include="Entity\Feedback.cs" />
     <Compile Include="Entity\IBaseEntity.cs" />
     <Compile Include="Entity\IEntity.cs" />
-    <Compile Include="Entity\Information.cs" />
-    <Compile Include="Entity\Information_User.cs" />
+    <Compile Include="Entity\MarkersInformation.cs" />
+    <Compile Include="Entity\Accept.cs" />
     <Compile Include="Entity\WeChatUser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repository\AuthRepository.cs" />

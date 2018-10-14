@@ -45,7 +45,7 @@ namespace ANT.MapInformation.Dapper
             {
                 if (property.Name == "Id")
                 {
-                    continue;
+                    if(property.PropertyType.FullName == "System.Int64")continue;
                 }
                 sb.Append("@" + property.Name + ",");
             }
@@ -109,6 +109,28 @@ namespace ANT.MapInformation.Dapper
             }
             return id;
         }
+
+
+        public int Update(T model,IDbTransaction transaction=null)
+        {
+            int id = 0;
+            StringBuilder sb = new StringBuilder();
+            sb.Append(" Update ");
+            sb.Append(model.GetType().Name);
+            sb.Append(" Set ");
+            foreach (var property in model.GetType().GetProperties())
+            {
+                sb.Append("" + property.Name + "="+"@"+ property.Name+",");
+            }
+            var strSql = sb.ToString().TrimEnd(',');
+            strSql += " where Id=@Id";
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                id = connection.Execute(strSql, model, transaction);
+            }
+            return id;
+        }
         /// <summary>
         /// 查询
         /// </summary>
@@ -132,7 +154,7 @@ namespace ANT.MapInformation.Dapper
         /// </summary>
         /// <param name="Id"></param>
         /// <returns></returns>
-        public T QueryById(long Id)
+        public T QueryById(string Id)
         {
             using (SqlConnection connection = new SqlConnection(connectionString))
             {

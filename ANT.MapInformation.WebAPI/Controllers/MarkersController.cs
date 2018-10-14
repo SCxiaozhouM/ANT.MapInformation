@@ -20,15 +20,15 @@ using Newtonsoft.Json.Serialization;
 
 namespace ANT.MapInformation.WebAPI.Controllers
 {
-    public class InformationController : ApiController
+    public class MarkersController : ApiController
     {
 
 
-        public DapperHelper<Information> InformationDapper { get; set; }
+        public DapperHelper<MarkersInformation> MarkersDapper { get; set; }
 
-        public InformationController()
+        public MarkersController()
         {
-           this.InformationDapper = new DapperHelper<Information>();
+           this.MarkersDapper = new DapperHelper<MarkersInformation>();
 
         }
 
@@ -55,9 +55,9 @@ namespace ANT.MapInformation.WebAPI.Controllers
             double maxlng = lng + dlng;
             //dapper对象
             string sql =
-                "select * from Information where latitude>@minlat and latitude<@maxlat and longitude>@minlng and longitude<@maxlng";
-           var list = InformationDapper.Query(sql, new {minlat, maxlat, minlng, maxlng});
-            var modelList = list.Select(o => new InformationListModel{Latitude =Convert.ToDouble(o.Latitude),Longitude = Convert.ToDouble(o.Longitude) ,Id = o.Id});
+                "select * from MarkersInformation where latitude>@minlat and latitude<@maxlat and longitude>@minlng and longitude<@maxlng";
+           var list = MarkersDapper.Query(sql, new {minlat, maxlat, minlng, maxlng});
+            var modelList = list.Select(o => new MarkersListModel{OpenId=o.OpenId, Latitude =Convert.ToDouble(o.Latitude),Longitude = Convert.ToDouble(o.Longitude) ,Id = o.Id});
             //序列化对象
             JsonSerializerSettings settings = new JsonSerializerSettings();
             settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
@@ -74,9 +74,9 @@ namespace ANT.MapInformation.WebAPI.Controllers
         /// <returns></returns>
         [HttpGet]
         [Authorize]
-        public HttpResponseMessage Get(long Id)
+        public HttpResponseMessage Get(string Id)
         {
-            var model  = InformationDapper.QueryById(Id);
+            var model  = MarkersDapper.QueryById(Id);
             JsonSerializerSettings settings = new JsonSerializerSettings();
             settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
             string str = JsonConvert.SerializeObject(model, settings);
@@ -94,11 +94,12 @@ namespace ANT.MapInformation.WebAPI.Controllers
         /// <returns></returns>
         [HttpPost]
         [Authorize]
-        [Route("post/Information")]//68295134
-        public HttpResponseMessage Post([FromBody]Information model)
+        [Route("post/Markers")]//68295134
+        public HttpResponseMessage Post([FromBody]MarkersInformation model)
         {
             model.Images = model.Images.TrimEnd(',');
-            InformationDapper.Add(model);
+            model.Id = Guid.NewGuid().ToString();
+            MarkersDapper.Add(model);
             HttpResponseMessage result =
                 Request.CreateResponse(HttpStatusCode.OK, new { status = "OK" }, Configuration.Formatters.JsonFormatter);
             return result;
@@ -109,7 +110,7 @@ namespace ANT.MapInformation.WebAPI.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        [Route("Upload/Information")]
+        [Route("Upload/Markers")]
         public HttpResponseMessage UploadImages()
         {
             HttpFileCollection files = HttpContext.Current.Request.Files;
@@ -165,12 +166,13 @@ namespace ANT.MapInformation.WebAPI.Controllers
             {
                 return Request.CreateResponse(HttpStatusCode.OK, new { status = "error", errorMsg="参数错误" }, Configuration.Formatters.JsonFormatter);                 
             }
+            //先查询是否已采纳
             Dictionary<string, string> dic = new Dictionary<string, string>();
             dic.Add("@openId", model.OpenId);
-            dic.Add("@InformationOpenId", model.InformationOpenId);
-            dic.Add("@InformationId", model.InformationId.ToString());
+            dic.Add("@MarkersOpenId", model.MarkersOpenId);
+            dic.Add("@MarkersId", model.MarkersId.ToString());
             dic.Add("@type",model.Type.ToString());
-            var count = InformationDapper.Transaction("accept", dic);
+            var count = MarkersDapper.Transaction("accept_C", dic);
             HttpResponseMessage result =
                 Request.CreateResponse(HttpStatusCode.OK, new { status = "OK",data= count }, Configuration.Formatters.JsonFormatter);
             return result;

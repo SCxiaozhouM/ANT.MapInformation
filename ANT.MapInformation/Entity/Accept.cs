@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace ANT.MapInformation.Entity
 {
-    public class Information_User:IEntity
+    public class Accept:IEntity
     {
+        public long Id { get; set; }
+
         /// <summary>
         /// openid
         /// </summary>
@@ -15,7 +17,7 @@ namespace ANT.MapInformation.Entity
         /// <summary>
         /// InformationId
         /// </summary>
-        public long InformationId { get; set; }
+        public long MarkersId { get; set; }
         /// <summary>
         /// 类型
         /// </summary>

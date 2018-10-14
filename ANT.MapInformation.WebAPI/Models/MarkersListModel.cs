@@ -3,12 +3,12 @@
     /// <summary>
     /// 地图信息list模型
     /// </summary>
-    public class InformationListModel
+    public class MarkersListModel
     {
         /// <summary>
         /// Id
         /// </summary>
-        public long Id { get; set; }
+        public string Id { get; set; }
 
         /// <summary>
         ///纬度
@@ -19,5 +19,6 @@
         /// 经度
         /// </summary>
         public double Longitude { get; set; }
+        public string OpenId { get; set; }
     }
 }

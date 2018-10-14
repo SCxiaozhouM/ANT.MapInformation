@@ -70,7 +70,7 @@ namespace ANT.MapInformation.WebAPI.Controllers
         public HttpResponseMessage Post([FromBody]WeChatUser model)
         {
             var m = WechatDapper.Query("select * from WechatUser where openid=@openId", new { openId = model.OpenId }).FirstOrDefault();
-            if(model==null)
+            if(m==null)
             {
                 WechatDapper.Add(model);
             }

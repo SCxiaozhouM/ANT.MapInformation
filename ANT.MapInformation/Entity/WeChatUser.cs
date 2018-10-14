@@ -12,6 +12,11 @@ namespace ANT.MapInformation.Entity
     public class WeChatUser: IBaseEntity
     {
         /// <summary>
+        /// Id
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
         /// openid
         /// </summary>
         public string OpenId { get; set; }

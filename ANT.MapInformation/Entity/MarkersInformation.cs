@@ -9,8 +9,15 @@ namespace ANT.MapInformation.Entity
     /// <summary>
     /// 情报表
     /// </summary>
-    public class Information:IBaseEntity
+    public class MarkersInformation:IBaseEntity
     {
+
+        /// <summary>
+        /// id
+        /// </summary>
+        public string Id { get; set; }
+
+
         /// <summary>
         /// openId
         /// </summary>

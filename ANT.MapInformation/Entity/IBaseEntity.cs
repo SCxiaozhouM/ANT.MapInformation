@@ -8,10 +8,7 @@ namespace ANT.MapInformation.Entity
 {
     public class IBaseEntity:IEntity
     {
-        /// <summary>
-        /// Id
-        /// </summary>
-        public long Id { get; set; }
+      
 
         /// <summary>
         /// 是否删除

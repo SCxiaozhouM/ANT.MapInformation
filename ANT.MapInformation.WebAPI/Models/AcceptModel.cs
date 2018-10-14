@@ -20,12 +20,12 @@ namespace ANT.MapInformation.WebAPI.Models
         /// 被采纳者openid
         /// </summary>
         [Required]
-        public string InformationOpenId { get; set; }
+        public string MarkersOpenId { get; set; }
         /// <summary>
         /// 地点id
         /// </summary>
         [Required]
-        public long InformationId { get; set; }
+        public string MarkersId { get; set; }
         /// <summary>
         /// 类型 0：采纳
         /// </summary>
