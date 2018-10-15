@@ -141,6 +141,7 @@
     <Compile Include="Controllers\WechatController.cs" />
     <Compile Include="Models\AcceptModel.cs" />
     <Compile Include="Models\MarkersListModel.cs" />
+    <Compile Include="Models\PageModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>

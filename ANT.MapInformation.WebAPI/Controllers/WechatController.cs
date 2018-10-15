@@ -8,7 +8,9 @@ using System.Text;
 using System.Web.Http;
 using ANT.MapInformation.Dapper;
 using ANT.MapInformation.Entity;
+using ANT.MapInformation.WebAPI.Models;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace ANT.MapInformation.WebAPI.Controllers
 {
@@ -23,6 +25,8 @@ namespace ANT.MapInformation.WebAPI.Controllers
         /// secret
         /// </summary>
         public static string Secret = "90f1ccbc2435d835544508bde9cde78c";
+
+        public int MyProperty { get; set; }
 
 
 
@@ -100,6 +104,55 @@ namespace ANT.MapInformation.WebAPI.Controllers
             
             return retString;
 
+        }
+
+        /// <summary>
+        /// 通过openId获取积分
+        /// </summary>
+        /// <param name="openId"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpGet]
+        public HttpResponseMessage GetIntegral(string openId)
+        {
+            var model = WechatDapper.Query("select * from WeChatUser where openId=@openId", new { openId }).FirstOrDefault();
+            var integral = -1;
+            if(model!=null)
+            {
+                integral = model.Integral;
+            }
+            HttpResponseMessage result =
+               Request.CreateResponse(HttpStatusCode.OK, new { status = "OK",data=integral }, Configuration.Formatters.JsonFormatter);
+            return result;
+        }
+        /// <summary>
+        /// 通过openid获取列表信息
+        /// </summary>
+        /// <param name="openId"></param>
+        /// <param name="pages"></param>
+        /// <param name="screen"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Authorize]
+        [Route("api/IntegralList")]
+        public HttpResponseMessage GetIntegralList([FromBody]PageModel pageModel )
+        {
+
+            if(ModelState.IsValid)
+            {
+                var modelList = WechatDapper.Query("select * from (select row_number()over(order by id) as rownumber,* from Integral where openId=@openId and type=@type and markersName like @screen) a " +
+                                        "  where rownumber  between @minnum and @maxNum", pageModel);
+                JsonSerializerSettings settings = new JsonSerializerSettings();
+                settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                string str = JsonConvert.SerializeObject(modelList, settings);
+                var obj = JsonConvert.DeserializeObject(str);
+                HttpResponseMessage result =
+                   Request.CreateResponse(HttpStatusCode.OK, new { status = "OK", data = obj }, Configuration.Formatters.JsonFormatter);
+                return result;
+            }
+
+            return Request.CreateResponse(HttpStatusCode.OK, new { status = "error", errorMsg="参数错误" }, Configuration.Formatters.JsonFormatter);
         }
     }
 }
