@@ -200,5 +200,25 @@ namespace ANT.MapInformation.Dapper
                 return param.Get<object>("@count");
             }
         }
+
+        /// <summary>
+        /// 获取count
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <returns></returns>
+        public long GetCount(string sqlWhere=null, object param = null)
+        {
+            //
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                string sql = "select count(*) from "+ typeof(T).Name;
+                if(sqlWhere!=null)
+                {
+                    sql += " where " + sqlWhere;
+                }
+                long count = Convert.ToInt64(connection.ExecuteScalar(sql,param));
+                return count;
+            }
+        }
     }
 }

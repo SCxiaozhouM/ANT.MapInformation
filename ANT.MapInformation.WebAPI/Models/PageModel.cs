@@ -14,7 +14,7 @@ namespace ANT.MapInformation.WebAPI.Models
         /// <summary>
         /// 每页多少条数据 默认25
         /// </summary>
-        public int PageSize { get; set; } = 25;
+        public int PageSize { get; set; } = 10;
 
         /// <summary>
         /// 当前页数 默认第一页
@@ -24,7 +24,7 @@ namespace ANT.MapInformation.WebAPI.Models
         /// <summary>
         /// 筛选条件
         /// </summary>
-        public int Screen { get; set; }
+        public string Search { get; set; } = "";
 
         /// <summary>
         /// 筛选类型
@@ -43,7 +43,7 @@ namespace ANT.MapInformation.WebAPI.Models
         /// 最小
         /// </summary>
         public int MinNum {
-            get{ return (PageSize - 1) * PageCount + 1; }
+            get{ return (PageCount - 1) * PageSize + 1; }
             set { this.MinNum = value; }
         }
 

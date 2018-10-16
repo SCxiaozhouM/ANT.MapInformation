@@ -52,6 +52,7 @@
     <Compile Include="Entity\Feedback.cs" />
     <Compile Include="Entity\IBaseEntity.cs" />
     <Compile Include="Entity\IEntity.cs" />
+    <Compile Include="Entity\Integral.cs" />
     <Compile Include="Entity\MarkersInformation.cs" />
     <Compile Include="Entity\Accept.cs" />
     <Compile Include="Entity\WeChatUser.cs" />

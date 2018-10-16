@@ -25,12 +25,17 @@ namespace ANT.MapInformation.WebAPI.Controllers
         /// secret
         /// </summary>
         public static string Secret = "90f1ccbc2435d835544508bde9cde78c";
-
-        public int MyProperty { get; set; }
-
+        
 
 
+        /// <summary>
+        /// wechatDapper对象
+        /// </summary>
         public DapperHelper<WeChatUser> WechatDapper { get; set; }
+        /// <summary>
+        /// 积分Dapper对象
+        /// </summary>
+        public DapperHelper<Integral> IntegralDapper { get; set; }
 
         /// <summary>
         /// 构造函数
@@ -38,7 +43,7 @@ namespace ANT.MapInformation.WebAPI.Controllers
         public WechatController()
         {
             this.WechatDapper = new DapperHelper<WeChatUser>();
-
+            IntegralDapper = new DapperHelper<Integral>();
         }
 
         // GET api/<controller>
@@ -130,7 +135,7 @@ namespace ANT.MapInformation.WebAPI.Controllers
         /// </summary>
         /// <param name="openId"></param>
         /// <param name="pages"></param>
-        /// <param name="screen"></param>
+        /// <param name="search"></param>
         /// <param name="type"></param>
         /// <returns></returns>
         [HttpPost]
@@ -141,14 +146,16 @@ namespace ANT.MapInformation.WebAPI.Controllers
 
             if(ModelState.IsValid)
             {
-                var modelList = WechatDapper.Query("select * from (select row_number()over(order by id) as rownumber,* from Integral where openId=@openId and type=@type and markersName like @screen) a " +
+                pageModel.Search = "%"+pageModel.Search + "%";
+                var modelList = IntegralDapper.Query("select * from (select row_number()over(order by id) as rownumber,* from Integral where openId=@openId and type=@type and markersName like @search) a " +
                                         "  where rownumber  between @minnum and @maxNum", pageModel);
+                var count = IntegralDapper.GetCount(" openId=@openId",new { openId=pageModel.OpenId});
                 JsonSerializerSettings settings = new JsonSerializerSettings();
                 settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
                 string str = JsonConvert.SerializeObject(modelList, settings);
                 var obj = JsonConvert.DeserializeObject(str);
                 HttpResponseMessage result =
-                   Request.CreateResponse(HttpStatusCode.OK, new { status = "OK", data = obj }, Configuration.Formatters.JsonFormatter);
+                   Request.CreateResponse(HttpStatusCode.OK, new { status = "OK", data = new { modelList= obj, isMax= count< pageModel.MaxNum} }, Configuration.Formatters.JsonFormatter);
                 return result;
             }
 

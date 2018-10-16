@@ -69,10 +69,10 @@ namespace ANT.MapInformation.Entity
         /// 描述
         /// </summary>
         public string Remark { get; set; }
-
-     
-       
-
+        /// <summary>
+        /// 封面图片
+        /// </summary>
+        public string CoverImage { get; set; }
         /// <summary>
         /// 图片
         /// </summary>

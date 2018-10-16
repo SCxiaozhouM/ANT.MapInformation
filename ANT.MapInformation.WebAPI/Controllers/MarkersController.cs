@@ -98,6 +98,11 @@ namespace ANT.MapInformation.WebAPI.Controllers
         public HttpResponseMessage Post([FromBody]MarkersInformation model)
         {
             model.Images = model.Images.TrimEnd(',');
+            var imgs = model.Images.Split(new char[]{ ',' }, StringSplitOptions.RemoveEmptyEntries);
+            if(imgs.Length>0)
+            {
+                model.CoverImage = imgs[0];
+            }
             model.Id = Guid.NewGuid().ToString();
             MarkersDapper.Add(model);
             HttpResponseMessage result =
@@ -162,7 +167,7 @@ namespace ANT.MapInformation.WebAPI.Controllers
         [Route("Post/Accept")]
         public HttpResponseMessage PostAccept([FromBody]AcceptModel model)
         {
-           if(!ModelState.IsValid)
+            if(!ModelState.IsValid)
             {
                 return Request.CreateResponse(HttpStatusCode.OK, new { status = "error", errorMsg="参数错误" }, Configuration.Formatters.JsonFormatter);                 
             }
@@ -175,6 +180,54 @@ namespace ANT.MapInformation.WebAPI.Controllers
             var count = MarkersDapper.Transaction("accept_C", dic);
             HttpResponseMessage result =
                 Request.CreateResponse(HttpStatusCode.OK, new { status = "OK",data= count }, Configuration.Formatters.JsonFormatter);
+            return result;
+        }
+
+        /// <summary>
+        /// 获取所有标点
+        /// </summary>
+        /// <param name="OpenId"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Authorize]
+        [Route("Markers/List")]
+        public HttpResponseMessage MarkersList([FromBody]PageModel pageModel)
+        {
+            pageModel.PageSize = 6;
+
+            pageModel.Search = "%" + pageModel.Search + "%";
+            var modelList = MarkersDapper.Query("select * from (select row_number()over(order by id) as rownumber,* from MarkersInformation where openId=@openId and IsDel=0 and areaName like @search) a " +
+                                        "  where rownumber  between @minnum and @maxNum", pageModel);
+            var count = MarkersDapper.GetCount(" openId=@openId",new { openId=pageModel.OpenId});
+            JsonSerializerSettings settings = new JsonSerializerSettings();
+            settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            string str = JsonConvert.SerializeObject(modelList, settings);
+            var obj = JsonConvert.DeserializeObject(str);
+            HttpResponseMessage result =
+               Request.CreateResponse(HttpStatusCode.OK, new { status = "OK", data = new { modelList = obj, isMax = count < pageModel.MaxNum } }, Configuration.Formatters.JsonFormatter);
+            return result;
+        }
+        /// <summary>
+        /// 获取所有标点
+        /// </summary>
+        /// <param name="OpenId"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Authorize]
+        [Route("Accept/List")]
+        public HttpResponseMessage AcceptList([FromBody]PageModel pageModel)
+        {
+            pageModel.PageSize = 6;
+            pageModel.Search = "%" + pageModel.Search + "%";
+            var modelList = MarkersDapper.Query("select * from (select row_number()over(order by id) as rownumber,* from MarkersInformation where  Id in (select markersId from [dbo].[Accept] where OpenId=@openId) and IsDel=0 and areaName like @search) a " +
+                                        "  where rownumber  between @minnum and @maxNum", pageModel);
+            var count = MarkersDapper.GetCount(" openId=@openId", new { openId = pageModel.OpenId });
+            JsonSerializerSettings settings = new JsonSerializerSettings();
+            settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            string str = JsonConvert.SerializeObject(modelList, settings);
+            var obj = JsonConvert.DeserializeObject(str);
+            HttpResponseMessage result =
+               Request.CreateResponse(HttpStatusCode.OK, new { status = "OK", data = new { modelList = obj, isMax = count < pageModel.MaxNum } }, Configuration.Formatters.JsonFormatter);
             return result;
         }
 
