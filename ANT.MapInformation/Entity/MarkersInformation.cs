@@ -72,7 +72,7 @@ namespace ANT.MapInformation.Entity
         /// <summary>
         /// 封面图片
         /// </summary>
-        public string CoverImage { get; set; }
+        public string CoverImage { get; set; } = "";
         /// <summary>
         /// 图片
         /// </summary>

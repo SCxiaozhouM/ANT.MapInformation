@@ -28,14 +28,30 @@ namespace ANT.MapInformation.Entity
         /// </summary>
         public string MarkersId { get; set; }
         /// <summary>
+        /// 标点名
+        /// </summary>
+        public string MarkersName { get; set; }
+        /// <summary>
         /// 内容
         /// </summary>
         public string Detail { get; set; }
 
         /// <summary>
-        /// 状态 0：待接受 1：已接收
+        /// 状态 0：待查看 1：已查看 2：未接受 3：已接受
         /// </summary>
         public int Status { get; set; }
-        
+
+
+        #region 扩展类
+        /// <summary>
+        /// 时间
+        /// </summary>
+        public string DateTime {
+            get {
+                return this.CreateTime.ToString("yyyy年MM月dd日");
+            }
+        }
+
+        #endregion
     }
 }

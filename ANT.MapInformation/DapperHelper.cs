@@ -47,6 +47,10 @@ namespace ANT.MapInformation.Dapper
                 {
                     if(property.PropertyType.FullName == "System.Int64")continue;
                 }
+                if(property.Name== "DateTime")
+                {
+                    continue;
+                }
                 sb.Append("@" + property.Name + ",");
             }
 
@@ -120,6 +124,11 @@ namespace ANT.MapInformation.Dapper
             sb.Append(" Set ");
             foreach (var property in model.GetType().GetProperties())
             {
+                if(property.Name=="DateTime")
+                {
+                    continue;
+                }
+
                 sb.Append("" + property.Name + "="+"@"+ property.Name+",");
             }
             var strSql = sb.ToString().TrimEnd(',');

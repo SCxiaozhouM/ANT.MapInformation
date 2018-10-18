@@ -133,7 +133,6 @@ namespace ANT.MapInformation.WebAPI.Controllers
                 path = directory + fileName;
                 if (string.IsNullOrEmpty(file.FileName) == false)
                     file.SaveAs(HttpContext.Current.Server.MapPath(directory) + fileName);
-
             }
             HttpResponseMessage result =
                 Request.CreateResponse(HttpStatusCode.OK, new { status = "OK",msg= path}, Configuration.Formatters.JsonFormatter);
@@ -177,6 +176,7 @@ namespace ANT.MapInformation.WebAPI.Controllers
             dic.Add("@MarkersOpenId", model.MarkersOpenId);
             dic.Add("@MarkersId", model.MarkersId.ToString());
             dic.Add("@type",model.Type.ToString());
+            dic.Add("@image", "../../img/jifen.png");
             var count = MarkersDapper.Transaction("accept_C", dic);
             HttpResponseMessage result =
                 Request.CreateResponse(HttpStatusCode.OK, new { status = "OK",data= count }, Configuration.Formatters.JsonFormatter);
@@ -197,7 +197,7 @@ namespace ANT.MapInformation.WebAPI.Controllers
 
             pageModel.Search = "%" + pageModel.Search + "%";
             var modelList = MarkersDapper.Query("select * from (select row_number()over(order by id) as rownumber,* from MarkersInformation where openId=@openId and IsDel=0 and areaName like @search) a " +
-                                        "  where rownumber  between @minnum and @maxNum", pageModel);
+                                        "  where rownumber  between @minnum and @maxNum", pageModel).OrderByDescending(o => o.CreateTime); ;
             var count = MarkersDapper.GetCount(" openId=@openId",new { openId=pageModel.OpenId});
             JsonSerializerSettings settings = new JsonSerializerSettings();
             settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
@@ -208,7 +208,7 @@ namespace ANT.MapInformation.WebAPI.Controllers
             return result;
         }
         /// <summary>
-        /// 获取所有标点
+        /// 获取采纳的所有标点
         /// </summary>
         /// <param name="OpenId"></param>
         /// <returns></returns>
@@ -220,7 +220,7 @@ namespace ANT.MapInformation.WebAPI.Controllers
             pageModel.PageSize = 6;
             pageModel.Search = "%" + pageModel.Search + "%";
             var modelList = MarkersDapper.Query("select * from (select row_number()over(order by id) as rownumber,* from MarkersInformation where  Id in (select markersId from [dbo].[Accept] where OpenId=@openId) and IsDel=0 and areaName like @search) a " +
-                                        "  where rownumber  between @minnum and @maxNum", pageModel);
+                                        "  where rownumber  between @minnum and @maxNum", pageModel).OrderByDescending(o=>o.CreateTime);
             var count = MarkersDapper.GetCount(" openId=@openId", new { openId = pageModel.OpenId });
             JsonSerializerSettings settings = new JsonSerializerSettings();
             settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
@@ -231,5 +231,40 @@ namespace ANT.MapInformation.WebAPI.Controllers
             return result;
         }
 
+
+        /// <summary>
+        /// 更改标点信息
+        /// </summary>
+        /// <returns></returns>
+        [Route("Update/Markers")]
+        [Authorize]
+        public HttpResponseMessage UpdateMarkers([FromBody] MarkersInformation model)
+        {
+            model.Images = model.Images.Trim(',');
+            var imgs = model.Images.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            if (imgs.Length > 0)
+            {
+                model.CoverImage = imgs[0];
+            }
+            MarkersDapper.Update(model);
+            HttpResponseMessage result =
+                Request.CreateResponse(HttpStatusCode.OK, new { status = "OK" }, Configuration.Formatters.JsonFormatter);
+            return result;
+        }
+        /// <summary>
+        /// 删除标点
+        /// </summary>
+        /// <param name="markerId"></param>
+        /// <returns></returns>
+        [Route("api/Delete")]
+        [HttpPost]
+        [Authorize]
+        public HttpResponseMessage DelMarkers([FromBody]MarkersInformation model)
+        {
+            MarkersDapper.Update("update markersInformation set isdel=1 where id=@Id",model);
+            HttpResponseMessage result =
+                Request.CreateResponse(HttpStatusCode.OK, new { status = "OK" }, Configuration.Formatters.JsonFormatter);
+            return result;
+        }
     }
 }

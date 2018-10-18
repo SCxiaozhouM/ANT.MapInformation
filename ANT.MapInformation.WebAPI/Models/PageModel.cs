@@ -29,7 +29,7 @@ namespace ANT.MapInformation.WebAPI.Models
         /// <summary>
         /// 筛选类型
         /// </summary>
-        public int Type { get; set; }
+        public string Type { get; set; }
 
         /// <summary>
         /// 最大
@@ -52,5 +52,10 @@ namespace ANT.MapInformation.WebAPI.Models
         /// </summary>
         
         public string  OpenId { get; set; }
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public string State { get; set; } = "0,1,2,3";
     }
 }

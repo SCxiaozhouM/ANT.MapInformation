@@ -64,7 +64,9 @@ namespace ANT.MapInformation.WebAPI.Controllers
             var responseStr = GetHttpRequest(
                 "https://api.weixin.qq.com/sns/jscode2session?appid="+ AppId + "&secret="+ Secret + "&js_code="+ code + "&grant_type=authorization_code",
                 "GET");
-            var obj = JsonConvert.DeserializeObject(responseStr);
+            var obj = JsonConvert.DeserializeObject<OpenIdModel>(responseStr);
+            //查询是否存在
+            obj.IsExist = WechatDapper.GetCount(" openId=@openId ", obj)==1;
             HttpResponseMessage result =
                 Request.CreateResponse(HttpStatusCode.OK, new { status = "OK", data = obj }, Configuration.Formatters.JsonFormatter);
             return result;
@@ -147,8 +149,8 @@ namespace ANT.MapInformation.WebAPI.Controllers
             if(ModelState.IsValid)
             {
                 pageModel.Search = "%"+pageModel.Search + "%";
-                var modelList = IntegralDapper.Query("select * from (select row_number()over(order by id) as rownumber,* from Integral where openId=@openId and type=@type and markersName like @search) a " +
-                                        "  where rownumber  between @minnum and @maxNum", pageModel);
+                var modelList = IntegralDapper.Query("select * from (select row_number()over(order by id) as rownumber,* from Integral where openId=@openId and type in ("+ pageModel.Type+ ") and markersName like @search) a " +
+                                        "  where rownumber  between @minnum and @maxNum", pageModel).OrderByDescending(o => o.CreateTime); ;
                 var count = IntegralDapper.GetCount(" openId=@openId",new { openId=pageModel.OpenId});
                 JsonSerializerSettings settings = new JsonSerializerSettings();
                 settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
@@ -161,5 +163,7 @@ namespace ANT.MapInformation.WebAPI.Controllers
 
             return Request.CreateResponse(HttpStatusCode.OK, new { status = "error", errorMsg="参数错误" }, Configuration.Formatters.JsonFormatter);
         }
+
+        
     }
 }
