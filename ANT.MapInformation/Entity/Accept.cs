@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ANT.MapInformation.Entity
 {
-    public class Accept:IEntity
+    public class Accept:IBaseEntity
     {
         public long Id { get; set; }
 
@@ -17,7 +17,7 @@ namespace ANT.MapInformation.Entity
         /// <summary>
         /// InformationId
         /// </summary>
-        public long MarkersId { get; set; }
+        public string MarkersId { get; set; }
         /// <summary>
         /// 类型
         /// </summary>

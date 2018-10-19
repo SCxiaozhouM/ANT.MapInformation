@@ -25,11 +25,12 @@ namespace ANT.MapInformation.WebAPI.Controllers
 
 
         public DapperHelper<MarkersInformation> MarkersDapper { get; set; }
+        public DapperHelper<Accept> AcceptDapper { get; set; }
 
         public MarkersController()
         {
            this.MarkersDapper = new DapperHelper<MarkersInformation>();
-
+            AcceptDapper = new DapperHelper<Accept>();
         }
 
         // GET api/<controller>
@@ -41,10 +42,10 @@ namespace ANT.MapInformation.WebAPI.Controllers
         /// <returns></returns>
         [Authorize]
         [HttpGet]
-        public HttpResponseMessage Get(double lat, double lng)
+        public HttpResponseMessage Get(double lat, double lng,int scope)
         {
             double r = 6371;//地球半径千米
-            double dis = 0.1;//0.5千米距离
+            double dis = scope / 1000.0;//0.5千米距离
             double dlng = 2 * Math.Asin(Math.Sin(dis / (2 * r)) / Math.Cos(lat * Math.PI / 180));
             dlng = dlng * 180 / Math.PI;
             double dlat = dis / r;
@@ -219,7 +220,7 @@ namespace ANT.MapInformation.WebAPI.Controllers
         {
             pageModel.PageSize = 6;
             pageModel.Search = "%" + pageModel.Search + "%";
-            var modelList = MarkersDapper.Query("select * from (select row_number()over(order by id) as rownumber,* from MarkersInformation where  Id in (select markersId from [dbo].[Accept] where OpenId=@openId) and IsDel=0 and areaName like @search) a " +
+            var modelList = MarkersDapper.Query("select * from (select row_number()over(order by id) as rownumber,* from MarkersInformation where  Id in (select markersId from [dbo].[Accept] where OpenId=@openId and IsDel=0) and IsDel=0 and areaName like @search) a " +
                                         "  where rownumber  between @minnum and @maxNum", pageModel).OrderByDescending(o=>o.CreateTime);
             var count = MarkersDapper.GetCount(" openId=@openId", new { openId = pageModel.OpenId });
             JsonSerializerSettings settings = new JsonSerializerSettings();
@@ -256,14 +257,26 @@ namespace ANT.MapInformation.WebAPI.Controllers
         /// </summary>
         /// <param name="markerId"></param>
         /// <returns></returns>
-        [Route("api/Delete")]
+        [Route("Delete/markers")]
         [HttpPost]
         [Authorize]
         public HttpResponseMessage DelMarkers([FromBody]MarkersInformation model)
         {
-            MarkersDapper.Update("update markersInformation set isdel=1 where id=@Id",model);
+            var count = MarkersDapper.Update("update markersInformation set isdel=1 where id=@Id",model);
             HttpResponseMessage result =
-                Request.CreateResponse(HttpStatusCode.OK, new { status = "OK" }, Configuration.Formatters.JsonFormatter);
+                Request.CreateResponse(HttpStatusCode.OK, new { status = "OK" , data = count == 1 }, Configuration.Formatters.JsonFormatter);
+            return result;
+        }
+        [HttpPost]
+        [Authorize]
+        [Route("Delete/Accept")]
+
+        public HttpResponseMessage DelAccept([FromBody] Accept model)
+        {
+
+            var count = AcceptDapper.Update("update Accept set isdel=1 where markersId=@markersId and openId=@openId", model);
+            HttpResponseMessage result =
+                Request.CreateResponse(HttpStatusCode.OK, new { status = "OK",data=count==1 }, Configuration.Formatters.JsonFormatter);
             return result;
         }
     }
