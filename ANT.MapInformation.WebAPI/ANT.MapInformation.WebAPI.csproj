@@ -135,6 +135,7 @@
     <Compile Include="App_Start\SimpleRefreshTokenProvider.cs" />
     <Compile Include="App_Start\SwaggerConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\CarInfoController.cs" />
     <Compile Include="Controllers\FeedbackController.cs" />
     <Compile Include="Controllers\MarkersController.cs" />
     <Compile Include="Controllers\TestController.cs" />

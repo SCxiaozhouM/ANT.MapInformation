@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="DapperHelper.cs" />
     <Compile Include="Entity\Authentication.cs" />
+    <Compile Include="Entity\CarInfo.cs" />
     <Compile Include="Entity\Feedback.cs" />
     <Compile Include="Entity\IBaseEntity.cs" />
     <Compile Include="Entity\IEntity.cs" />

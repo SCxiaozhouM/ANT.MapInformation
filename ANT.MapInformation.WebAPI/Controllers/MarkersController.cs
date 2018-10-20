@@ -42,7 +42,7 @@ namespace ANT.MapInformation.WebAPI.Controllers
         /// <returns></returns>
         [Authorize]
         [HttpGet]
-        public HttpResponseMessage Get(double lat, double lng,int scope)
+        public IHttpActionResult Get(double lat, double lng,int scope)
         {
             double r = 6371;//地球半径千米
             double dis = scope / 1000.0;//0.5千米距离
@@ -64,9 +64,7 @@ namespace ANT.MapInformation.WebAPI.Controllers
             settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
             string str = JsonConvert.SerializeObject(modelList, settings);
             var obj = JsonConvert.DeserializeObject(str);
-            HttpResponseMessage result =
-                Request.CreateResponse(HttpStatusCode.OK, new {status="OK",data= obj }, Configuration.Formatters.JsonFormatter);
-            return result;
+            return new ApiResult();
         }
         /// <summary>
         /// 根据id 获取信息

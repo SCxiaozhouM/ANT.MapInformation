@@ -12,7 +12,8 @@ namespace ANT.MapInformation.WebAPI.App_Start
     /// <summary>
     /// api返回结果
     /// </summary>
-    public class ApiResult
+    public class ApiResult: IHttpActionResult
+
     {
         /// <summary>
         /// 状态
@@ -30,6 +31,11 @@ namespace ANT.MapInformation.WebAPI.App_Start
         /// 异常信息
         /// </summary>
         public string ErrorMsg { get; set; }
+
+        public Task<HttpResponseMessage> ExecuteAsync(CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
     }
 
 }
