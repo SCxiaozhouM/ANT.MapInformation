@@ -1,0 +1,153 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <link href="../css/bootstrap.min.css" rel="stylesheet" />
+    <link href="../js/DataTables/css/jquery.dataTables.css" rel="stylesheet" />
+    <style>
+        .caozuo {
+            cursor: pointer;
+        }
+
+        span {
+            margin-right: 20px;
+        }
+    </style>
+</head>
+<body>
+    <table id="table_local" class="table table-border table-bordered table-hover">
+        <thead>
+            <tr>
+                <th>小区/地名</th>
+                <th>所属人</th>
+                <th>图片</th>
+                <th>描述</th>
+                <th>点赞数</th>
+                <th>时间</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+    </table>
+</body>
+</html>
+<script src="../js/jquery-3.2.1.min.js"></script>
+<script src="../js/layer/layer.js"></script>
+<script src="../js/DataTables/js/jquery.js"></script>
+<script src="../js/DataTables/js/jquery.dataTables.js"></script>
+<script>
+    $(document).ready(function () {
+        $("#table_local").dataTable({
+            "bPaginate": true,//分页工具条显示
+            "bStateSave": true, //是否打开客户端状态记录功能,此功能在ajax刷新纪录的时候不会将个性化设定回复为初始化状态
+            "bScrollCollapse": true, //当显示的数据不足以支撑表格的默认的高度
+            "bLengthChange": true, //每页显示的记录数
+            "bFilter": true, //搜索栏
+            "bSort": true, //是否支持排序功能
+            "bInfo": true, //显示表格信息
+            "bAutoWidth": true, //自适应宽度
+            "bJQueryUI": false,//是否开启主题
+            "searching": true,
+            "bDestroy": true,
+            "bProcessing": true, //开启读取服务器数据时显示正在加载中……特别是大数据量的时候，开启此功能比较好
+            "bServerSide": true,//服务器处理分页，默认是false，需要服务器处理，必须true
+            "sAjaxDataProp": "aData",//是服务器分页的标志，必须有   ,
+            ajax: {
+                url: "/Markers/ListInfo",
+                type: "post",
+                data: {
+                    pageCount: 1
+                }
+            },
+            lengthMenu: [5, 10, 20, 30],//这里也可以设置分页，但是不能设置具体内容，只能是一维或二维数组的方式，所以推荐下面language里面的写法。
+            columns: [//data 匹配的字段 class class样式  render:可以返回自定义的标签
+                { "data": "areaName", "class": "text-center", "sWidth": "20%" },
+                { "data": "userName", "class": "text-center", "sWidth": "10%" },
+                {
+                    "class": "td-status text-center",
+                    "data": "coverImage",
+                    "render": function (data, type, full) {
+                        return '<img src="' + data + '" style="width:50px;">';
+                    },
+                    "sWidth": "10%"
+                },
+                {
+                    "data": "remark", "class": "text-center"
+                },
+                {
+                    "data": "acceptNum", "sWidth": "5%", "class": "text-center"
+                },
+                {
+                    "data": "createTime", "sWidth": "10%", "class": "text-center"
+                },
+                {
+                    "data": "id",
+                    "class": "caozuo text-center",
+                    "render": function (data, type, full) {
+                        return "<span onclick='operate(this)' type='view' id='" + data + "'>查看</span>&nbsp;&nbsp;&nbsp;<span onclick='operate(this)'  type='del' id='" + data + "'>删除</span>";
+                    }, "sWidth": "10%"
+                },
+            ],
+            "oLanguage": {//语言设置
+                "sProcessing": "处理中...",
+                "sLengthMenu": "显示 _MENU_ 项结果",
+                "sZeroRecords": "没有匹配结果",
+                "sInfo": "总共_PAGES_ 页，显示第_START_ 到第 _END_ ，筛选之后得到 _TOTAL_ 条，初始_MAX_ 条 ",//左下角的信息显示，大写的词为关键字。
+                "sInfoEmpty": "显示第 0 至 0 项结果，共 0 项",
+                "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
+                "sInfoPostFix": "",
+                "sSearch": "搜索:",
+                "sUrl": "",
+                "sEmptyTable": "表中数据为空",
+                "sLoadingRecords": "载入中...",
+                "sInfoThousands": ",",
+                "oPaginate": {
+                    "sFirst": "首页",
+                    "sPrevious": "上页",
+                    "sNext": "下页",
+                    "sLast": "末页"
+                },
+                "oAria": {
+                    "sSortAscending": ": 以升序排列此列",
+                    "sSortDescending": ": 以降序排列此列"
+                }
+            }
+
+        });
+    });
+
+    function operate(that) {
+        var id = $(that).attr("id");
+        var type = $(that).attr("type");
+        if (type == "del") {
+            layer.confirm('确定删除吗？', {
+                btn: ['确定', '取消'] //按钮
+            }, function () {
+                $.ajax({
+                    url: "/Delete/markers",
+                    data: {
+                        id: id
+                    },
+                    dataType: "../../View/ON",
+                    method: "post",
+                    success: function (res) {
+                        if (res.data) {
+                            window.location.reload();
+                        }
+                    }
+                })
+            }, function () {
+                layer.msg('已取消');
+            });
+        } else if (type == "view") {
+            layer.open({
+                type: 2,
+                title: '标点信息',
+                shadeClose: true,
+                shade: 0.8,
+                area: ['70%', '85%'],
+                content: 'markerView.html?id=' + id //iframe的url
+            });
+        }
+    }
+</script>

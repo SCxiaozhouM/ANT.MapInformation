@@ -1,0 +1,153 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <link href="../js/layui/css/layui.css" rel="stylesheet" />
+</head>
+<body>
+    <!--
+        <form>
+            <div><span>小区/地点名：</span><input type="text" name="areaName" v-model="dataInfo.areaName" /></div>
+            <div><span>停车费用标准：</span><input type="text" name="chargingStandard" v-model="dataInfo.chargingStandard" /></div>
+            <div><span>距离目的地：</span><input type="text" name="distance" v-model="dataInfo.distance" /></div>
+            <div><span>车库限高：</span><input type="text" name="limitHeight" v-model="dataInfo.limitHeight" /></div>
+            <div>
+                <span>是否可进入：</span><input type="radio" name="isGetIn" :checked="dataInfo.isGetIn" value="1" /><label>是</label>
+                <input type="radio" name="isGetIn" value="0" :checked="!dataInfo.isGetIn" /><label>否</label>
+            </div>
+            <div>
+                <span>是否地下车库：</span><input type="radio" v-model="dataInfo.isUndergroundGarage" :checked="dataInfo.isUndergroundGarage" /><label>是</label>
+                <input type="radio" :checked="!dataInfo.isUndergroundGarage" /><label>否</label>
+            </div>
+            <div>
+                <span>是否收费：</span><input type="radio" name="isCharges" :checked="dataInfo.isCharges" /><label>是</label>
+                <input type="radio" name="isCharges" :checked="!dataInfo.isCharges" /><label>否</label>
+            </div
+            <div><span>描述：</span><textarea name="remark" v-model="dataInfo.remark"></textarea></div>
+            <div>
+                <span>图片：</span>
+                <div v-for="item in dataInfo.images" style="display:inline-block;margin-left:10px;">
+                    <img :src="item" style="height: 150px;" />
+                </div>
+            </div>
+        </form>
+    </div>-->
+
+    <div id="app">
+        <form class="layui-form" action="" lay-filter="example">
+            <div class="layui-form-item">
+                <label class="layui-form-label">小区/地点名</label>
+                <div class="layui-input-block">
+                    <input type="text" name="areaName" placeholder="请输入" class="layui-input" v-model="dataInfo.areaName" />
+                </div>
+            </div> <div class="layui-form-item">
+                <label class="layui-form-label">费用标准</label>
+                <div class="layui-input-block">
+                    <input type="text" name="chargingStandard" placeholder="请输入" class="layui-input" v-model="dataInfo.chargingStandard" />
+                </div>
+            </div> <div class="layui-form-item">
+                <label class="layui-form-label">距离目的地</label>
+                <div class="layui-input-block">
+                    <input type="text" name="distance" placeholder="请输入" class="layui-input" v-model="dataInfo.distance" />
+                </div>
+            </div> <div class="layui-form-item">
+                <label class="layui-form-label">车库限高</label>
+                <div class="layui-input-block">
+                    <input type="text" name="limitHeight" placeholder="请输入" class="layui-input" v-model="dataInfo.limitHeight" />
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">是否可进入</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="isGetIn" value="1" title="是" :checked="dataInfo.isGetIn">
+                    <input type="radio" name="isGetIn" value="0" title="否" :checked="!dataInfo.isGetIn">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">是否车库</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="isUndergroundGarage" value="1" title="是" :checked="dataInfo.isUndergroundGarage">
+                    <input type="radio" name="isUndergroundGarage" value="0" title="否" :checked="!dataInfo.isUndergroundGarage">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">是否收费</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="isCharges" value="1" title="是" checked="" :checked="dataInfo.isCharges">
+                    <input type="radio" name="isCharges" value="0" title="否" :checked="!dataInfo.isCharges">
+                </div>
+            </div>
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">描述</label>
+                <div class="layui-input-block">
+                    <textarea placeholder="请输入内容" class="layui-textarea" v-model="dataInfo.remark" name="desc"></textarea>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">描述</label>
+                <div class="layui-input-block" v-for="item in dataInfo.images" style="display:inline-block;margin-left:10px;">
+                    <img :src="item" style="height: 150px;" @click="viewImg" />
+                </div>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
+<script src="../js/jquery-3.2.1.min.js"></script>
+<script src="../js/layui/layui.js"></script>
+<script src="../js/Vue.js"></script>
+
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            dataInfo: {}
+        },
+        created: function () {
+            layui.use('form', function () {
+                var form = layui.form;
+
+                //刷新界面 所有元素
+
+                form.render();
+
+            });
+            this.get();
+        },
+        methods: {
+            get: function () {
+                $.ajax({
+                    url: "/api/markers",
+                    methods: "get",
+                    data: { id: getUrlParam("id") },
+                    dataType: "json",
+                    success: function (res) {
+                        vm.dataInfo = res.data
+                        vm.dataInfo.images = res.data.images.split(',');
+                    }
+                });
+
+            },
+            viewImg: function (e) {
+                var img = $(e.target).attr("src");
+                console.log(e);
+                window.parent.layer.open({
+                    type: 1,
+                    title: "",
+                    skin: 'layui-layer-rim', //加上边框
+                    content: "<img src='" + img + "' width='400px'>/,    "
+                });
+            }
+        }
+    })
+
+
+    //获取url中的参数
+    function getUrlParam(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+        var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+        if (r != null) return unescape(r[2]); return null; //返回参数值
+    }
+</script>

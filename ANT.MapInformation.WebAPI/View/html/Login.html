@@ -1,0 +1,33 @@
+﻿
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>后台管理登录</title>
+    <script src="../View/js/jquery-3.2.1.min.js"></script>
+    <script src="../View/JqueryDB.js"></script>
+    <link href="css/Login.css" rel="stylesheet" />
+    <script type="text/javascript">
+        var parmlist = GetUrlForParm(document.location.href);
+        $(function () {
+            AnalysisHtmlToString();
+        })
+
+    </script>
+</head>
+<body style="background:#152a5f">
+    <div class="div_kuai">
+        <h1>后台管理</h1>
+        <div>
+            账户：<input type="text" />
+        </div>
+        <div>
+            密码：<input type="text" />
+        </div>
+        <div>
+            <button>登陆</button>
+        </div>
+    </div>
+</body>
+</html>

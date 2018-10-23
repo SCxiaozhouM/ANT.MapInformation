@@ -1,5 +1,7 @@
 ﻿using System.Security.Claims;
 using System.Threading.Tasks;
+using ANT.MapInformation.Dapper;
+using ANT.MapInformation.Entity;
 using Microsoft.Owin.Security.OAuth;
 
 namespace ANT.MapInformation.WebAPI
@@ -9,6 +11,9 @@ namespace ANT.MapInformation.WebAPI
     /// </summary>
     public class SimpleAuthorizationServerProvider: OAuthAuthorizationServerProvider
     {
+
+
+
         public override Task ValidateClientAuthentication(OAuthValidateClientAuthenticationContext context)
         {
             context.Validated();
@@ -21,6 +26,7 @@ namespace ANT.MapInformation.WebAPI
             /*
              * 身份验证
              */
+          
             var identity = new ClaimsIdentity(context.Options.AuthenticationType);
             identity.AddClaim(new Claim("sub", context.UserName));
             identity.AddClaim(new Claim("role", "user"));

@@ -8,6 +8,7 @@ using System.Text;
 using System.Web.Http;
 using ANT.MapInformation.Dapper;
 using ANT.MapInformation.Entity;
+using ANT.MapInformation.WebAPI.App_Start;
 using ANT.MapInformation.WebAPI.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -90,7 +91,28 @@ namespace ANT.MapInformation.WebAPI.Controllers
             return result;
         }
 
+        [HttpPost]
+        [Route("post/wechatList")]
+        public IHttpActionResult Post([FromBody]NewPageModel pagemodel)
+        {
+            pagemodel.Search = "%" + pagemodel.Search + "%";
+            var modelList = WechatDapper.Query("select * from (select row_number()over(order by id) as rownumber,* from WechatUser where  IsDel=0 ) a " +
+                                        "  where rownumber  between @minnum and @maxNum", pagemodel).OrderByDescending(o => o.CreateTime);
+            var count = WechatDapper.GetCount();
+            JsonSerializerSettings settings = new JsonSerializerSettings();
+            settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            string str = JsonConvert.SerializeObject(modelList, settings);
+            var obj = JsonConvert.DeserializeObject(str);
+            //返回参数集合
+            Dictionary<string, object> map = new Dictionary<string, object>();
+            map.Add("iTotalRecords", pagemodel.Start);
+            map.Add("iTotalDisplayRecords", count);//总数据个数
+            map.Add("aData", obj);
 
+
+
+            return Json(map);
+        }
 
         /// <summary>
         /// 发送get请求
@@ -129,7 +151,7 @@ namespace ANT.MapInformation.WebAPI.Controllers
                 integral = model.Integral;
             }
             HttpResponseMessage result =
-               Request.CreateResponse(HttpStatusCode.OK, new { status = "OK",data=integral }, Configuration.Formatters.JsonFormatter);
+               Request.CreateResponse(HttpStatusCode.OK, new { status = "OK",data=new { integral ,carId= model.CarId} }, Configuration.Formatters.JsonFormatter);
             return result;
         }
         /// <summary>

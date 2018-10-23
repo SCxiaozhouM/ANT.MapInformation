@@ -1,5 +1,6 @@
 ﻿using ANT.MapInformation.Dapper;
 using ANT.MapInformation.Entity;
+using ANT.MapInformation.WebAPI.App_Start;
 using ANT.MapInformation.WebAPI.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -20,12 +21,14 @@ namespace ANT.MapInformation.WebAPI.Controllers
     {
         public DapperHelper<Feedback> FeedbackDapper { get; set; }
 
+        public DapperHelper<WeChatUser> WeChatUserDapper { get; set; }
         /// <summary>
         /// 构造函数
         /// </summary>
         public FeedbackController()
         {
             this.FeedbackDapper = new DapperHelper<Feedback>();
+            WeChatUserDapper = new DapperHelper<WeChatUser>();
         }
 
         /// <summary>
@@ -107,7 +110,6 @@ namespace ANT.MapInformation.WebAPI.Controllers
         /// <param name="Id"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        [Authorize]
         [HttpPost]
         [Route("api/FeedbackAction")]
         public HttpResponseMessage FeedbackAction([FromBody] JObject obj)
@@ -138,10 +140,52 @@ namespace ANT.MapInformation.WebAPI.Controllers
                 }
                
             }
-
             HttpResponseMessage result =
                      Request.CreateResponse(HttpStatusCode.OK, new {status,data }, Configuration.Formatters.JsonFormatter);
             return result;
+        }
+
+        /// <summary>
+        /// 反馈查询
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("feedback/list")]
+        public IHttpActionResult GetList([FromBody]JObject objModel)
+        {
+            NewPageModel pagemodel = new NewPageModel();
+            pagemodel.Length = Convert.ToInt32(objModel["length"]);
+            pagemodel.PageCount = Convert.ToInt32(objModel["pageCount"]);
+            pagemodel.Search = "%" + objModel["search"].First.First.ToString() + "%";
+            pagemodel.Start = Convert.ToInt32(objModel["start"]);
+            var modelList = FeedbackDapper.Query("select * from (select row_number()over(order by id) as rownumber,* from feedback where IsDel=0 and markersName like @search) a " +
+                                         "  where rownumber  between @minnum and @maxNum", pagemodel).OrderByDescending(o => o.CreateTime);
+            foreach (var model in modelList)
+            {
+                var send = WeChatUserDapper.Query("select * from wechatUser where openid='" + model.SendOpenId + "'").FirstOrDefault();
+                if(send!=null)
+                {
+                    model.SendOpenId = send.NickName;
+                }
+                var receive = WeChatUserDapper.Query("select * from wechatUser where openid='" + model.ReceiveOpenId + "'").FirstOrDefault();
+                
+                if(receive!=null)
+                {
+                    model.ReceiveOpenId = receive.NickName;
+                }
+            }
+            var count = FeedbackDapper.GetCount(" isdel=0 ");
+            JsonSerializerSettings settings = new JsonSerializerSettings();
+            settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            string str = JsonConvert.SerializeObject(modelList, settings);
+            var obj = JsonConvert.DeserializeObject(str);
+            //返回参数集合
+            Dictionary<string, object> map = new Dictionary<string, object>();
+            map.Add("iTotalRecords", pagemodel.Start);
+            map.Add("iTotalDisplayRecords", count);//总数据个数
+            map.Add("aData", obj);
+            return Json(map);
         }
 
     }

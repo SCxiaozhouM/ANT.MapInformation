@@ -26,11 +26,12 @@ namespace ANT.MapInformation.WebAPI.Controllers
 
         public DapperHelper<MarkersInformation> MarkersDapper { get; set; }
         public DapperHelper<Accept> AcceptDapper { get; set; }
-
+        public DapperHelper<WeChatUser> WechatUserDpper { get; set; }
         public MarkersController()
         {
            this.MarkersDapper = new DapperHelper<MarkersInformation>();
             AcceptDapper = new DapperHelper<Accept>();
+            WechatUserDpper = new DapperHelper<WeChatUser>();
         }
 
         // GET api/<controller>
@@ -42,7 +43,7 @@ namespace ANT.MapInformation.WebAPI.Controllers
         /// <returns></returns>
         [Authorize]
         [HttpGet]
-        public IHttpActionResult Get(double lat, double lng,int scope)
+        public HttpResponseMessage Get(double lat, double lng,int scope)
         {
             double r = 6371;//地球半径千米
             double dis = scope / 1000.0;//0.5千米距离
@@ -64,15 +65,20 @@ namespace ANT.MapInformation.WebAPI.Controllers
             settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
             string str = JsonConvert.SerializeObject(modelList, settings);
             var obj = JsonConvert.DeserializeObject(str);
-            return new ApiResult();
+            HttpResponseMessage result =
+                Request.CreateResponse(HttpStatusCode.OK, new { status = "OK", data = obj }, Configuration.Formatters.JsonFormatter);
+            return result;
         }
+
+
+
         /// <summary>
         /// 根据id 获取信息
         /// </summary>
         /// <param name="Id"></param>
         /// <returns></returns>
         [HttpGet]
-        [Authorize]
+        //[Authorize]
         public HttpResponseMessage Get(string Id)
         {
             var model  = MarkersDapper.QueryById(Id);
@@ -257,7 +263,6 @@ namespace ANT.MapInformation.WebAPI.Controllers
         /// <returns></returns>
         [Route("Delete/markers")]
         [HttpPost]
-        [Authorize]
         public HttpResponseMessage DelMarkers([FromBody]MarkersInformation model)
         {
             var count = MarkersDapper.Update("update markersInformation set isdel=1 where id=@Id",model);
@@ -276,6 +281,40 @@ namespace ANT.MapInformation.WebAPI.Controllers
             HttpResponseMessage result =
                 Request.CreateResponse(HttpStatusCode.OK, new { status = "OK",data=count==1 }, Configuration.Formatters.JsonFormatter);
             return result;
+        }
+
+
+
+        /// <summary>
+        /// 获取所有标点信息
+        /// </summary>
+        /// <param name="OpenId"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("Markers/ListInfo")]
+        public IHttpActionResult MarkersListInfo([FromBody]JObject objModel)
+        {
+            NewPageModel pagemodel   = new NewPageModel();
+            pagemodel.Length = Convert.ToInt32(objModel["length"]);
+            pagemodel.PageCount = Convert.ToInt32(objModel["pageCount"]);
+            pagemodel.Search = "%" + objModel["search"].First.First.ToString() + "%";
+            pagemodel.Start = Convert.ToInt32(objModel["start"]);
+            var modelList = MarkersDapper.Query("select * from (select row_number()over(order by id) as rownumber,* from MarkersInformation where  IsDel=0 and areaName like @search) a " +
+                                        "  where rownumber  between @minnum and @maxNum", pagemodel).OrderByDescending(o => o.CreateTime).Select(o=>new MarkersModel {
+                                            AcceptNum = o.AcceptNum, CoverImage=o.CoverImage,
+                                         Id=o.Id, AreaName=o.AreaName, CreateTime=o.CreateTime.ToString("yyyy-MM-dd"), Remark=o.Remark, UserName= WechatUserDpper.Query("select NickName from  WechatUser where openId='"+o.OpenId+"'").FirstOrDefault().NickName
+                                        });
+            var count = MarkersDapper.GetCount(" isdel=0");
+            JsonSerializerSettings settings = new JsonSerializerSettings();
+            settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            string str = JsonConvert.SerializeObject(modelList, settings);
+            var obj = JsonConvert.DeserializeObject(str);
+            //返回参数集合
+            Dictionary<string, object> map = new Dictionary<string, object>();
+            map.Add("iTotalRecords", pagemodel.Start);
+            map.Add("iTotalDisplayRecords", count);//总数据个数
+            map.Add("aData", obj);
+            return Json(map);
         }
     }
 }
