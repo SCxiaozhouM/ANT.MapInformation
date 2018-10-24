@@ -98,11 +98,12 @@ namespace ANT.MapInformation.WebAPI.Controllers
         }
 
         [HttpPost]
+        [JsonNetActionFilter]
         [Route("post/carList")]
         public IHttpActionResult Post([FromBody]NewPageModel pagemodel)
         {
             pagemodel.Search = "%" + pagemodel.Search + "%";
-            var modelList = CarInfoDappler.Query("select * from (select row_number()over(order by id) as rownumber,* from WechatUser where  IsDel=0 ) a " +
+            var modelList = CarInfoDappler.Query("select * from (select row_number()over(order by id) as rownumber,* from carInfo where  IsDel=0 ) a " +
                                         "  where rownumber  between @minnum and @maxNum", pagemodel).OrderByDescending(o => o.CreateTime);
             var count = CarInfoDappler.GetCount();
             JsonSerializerSettings settings = new JsonSerializerSettings();
@@ -114,9 +115,6 @@ namespace ANT.MapInformation.WebAPI.Controllers
             map.Add("iTotalRecords", pagemodel.Start);
             map.Add("iTotalDisplayRecords", count);//总数据个数
             map.Add("aData", obj);
-
-
-
             return Json(map);
         }
 

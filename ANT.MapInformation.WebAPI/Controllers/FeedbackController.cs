@@ -151,6 +151,7 @@ namespace ANT.MapInformation.WebAPI.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost]
+        [JsonNetActionFilter]
         [Route("feedback/list")]
         public IHttpActionResult GetList([FromBody]JObject objModel)
         {

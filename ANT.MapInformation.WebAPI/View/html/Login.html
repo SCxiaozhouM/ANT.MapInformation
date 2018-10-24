@@ -5,29 +5,35 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>后台管理登录</title>
-    <script src="../View/js/jquery-3.2.1.min.js"></script>
-    <script src="../View/JqueryDB.js"></script>
-    <link href="css/Login.css" rel="stylesheet" />
-    <script type="text/javascript">
-        var parmlist = GetUrlForParm(document.location.href);
-        $(function () {
-            AnalysisHtmlToString();
-        })
-
-    </script>
+    <script src="../js/jquery-3.2.1.min.js"></script>
+    <link href="../css/Login.css" rel="stylesheet" />
 </head>
 <body style="background:#152a5f">
-    <div class="div_kuai">
+    <form class="div_kuai" id="form1">
         <h1>后台管理</h1>
         <div>
-            账户：<input type="text" />
+            账户：<input type="text" name="username"/>
         </div>
         <div>
-            密码：<input type="text" />
+            密码：<input type="text" name="password"/>
         </div>
         <div>
-            <button>登陆</button>
+            <div onclick="Login()">登陆</div>
         </div>
-    </div>
+    </form>
 </body>
 </html>
+<script>
+    function Login() {
+        var data = $("#form1").serializeArray();
+        $.ajax({
+            url: "/user/login",
+            data: data,
+            dataType: "json",
+            method: "post",
+            success: function (res) {
+                window.location.href='main.html'
+            }
+        });
+    }
+</script>

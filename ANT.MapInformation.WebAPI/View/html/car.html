@@ -19,23 +19,26 @@
     <table id="table_local" class="table table-border table-bordered table-hover">
         <thead>
             <tr>
-                <th>小区/地名</th>
                 <th>所属人</th>
-                <th>图片</th>
-                <th>描述</th>
-                <th>点赞数</th>
-                <th>时间</th>
-                <th>操作</th>
+                <th>车牌号</th>
+                <th>品牌</th>
+                <th>车辆类型</th>
+                <th>使用燃料</th>
+                <th>使用性质</th>
+                <th>宽高</th>
+                <th>载客量(人)</th>
+                <th>载重量(吨)</th>
             </tr>
         </thead>
     </table>
 </body>
 </html>
-<script src="../js/DataTables/js/jquery.js"></script>
-<script src="../js/jquery.cookie.js"></script>
+<script src="../js/jquery-3.2.1.min.js"></script>
 <script src="../js/layer/layer.js"></script>
+<script src="../js/DataTables/js/jquery.js"></script>
 <script src="../js/DataTables/js/jquery.dataTables.js"></script>
 <script>
+    let detail;
     $(document).ready(function () {
         $("#table_local").dataTable({
             "bPaginate": true,//分页工具条显示
@@ -53,43 +56,39 @@
             "bServerSide": true,//服务器处理分页，默认是false，需要服务器处理，必须true
             "sAjaxDataProp": "aData",//是服务器分页的标志，必须有   ,
             ajax: {
-                url: "/Markers/ListInfo?a=1",
+                url: "/post/carList",
                 type: "post",
-                headers: {
-                    "Authorization": "bearer "
-                },
                 data: {
                     pageCount: 1
-                }
+                },
+
             },
             lengthMenu: [5, 10, 20, 30],//这里也可以设置分页，但是不能设置具体内容，只能是一维或二维数组的方式，所以推荐下面language里面的写法。
             columns: [//data 匹配的字段 class class样式  render:可以返回自定义的标签
-                { "data": "areaName", "class": "text-center", "sWidth": "20%" },
-                { "data": "userName", "class": "text-center", "sWidth": "10%" },
+                { "data": "openId", "class": "text-center" },
+                { "data": "flapperNumber", "class": "text-center"},
+                { "data": "brand", "class": "text-center" },
                 {
-                    "class": "td-status text-center",
-                    "data": "coverImage",
-                    "render": function (data, type, full) {
-                        return '<img src="' + data + '" style="width:50px;">';
-                    },
-                    "sWidth": "10%"
+                    "data": "carType", "class": "text-center"
                 },
                 {
-                    "data": "remark", "class": "text-center"
+                    "data": "fuel", "class": "text-center"
                 },
                 {
-                    "data": "acceptNum", "sWidth": "5%", "class": "text-center"
+                    "data": "nature", "sWidth": "10%", "class": "text-center"
                 },
                 {
-                    "data": "createTime", "sWidth": "10%", "class": "text-center"
+                    "data": "widthHeight",
+                    "class": "text-center"
                 },
                 {
-                    "data": "id",
-                    "class": "caozuo text-center",
-                    "render": function (data, type, full) {
-                        return "<span onclick='operate(this)' type='view' id='" + data + "'>查看</span>&nbsp;&nbsp;&nbsp;<span onclick='operate(this)'  type='del' id='" + data + "'>删除</span>";
-                    }, "sWidth": "10%"
+                    "data": "busload",
+                    "class": "text-center"
                 },
+                {
+                    "data": "loadingCapacity",
+                    "class": "text-center"
+                }
             ],
             "oLanguage": {//语言设置
                 "sProcessing": "处理中...",
@@ -118,7 +117,19 @@
 
         });
     });
-
+    function selectChange() {
+        $.ajax({
+            url: "/api/FeedbackAction",
+            dataType: "json",
+            method: "post",
+            data: {
+                Id: $("#selectId").attr("attr"), type: $("#selectId").val()
+            },
+                success: function (res) {
+                window.location.reload();
+            }
+        });
+    }
     function operate(that) {
         var id = $(that).attr("id");
         var type = $(that).attr("type");
@@ -150,6 +161,29 @@
                 shade: 0.8,
                 area: ['70%', '85%'],
                 content: 'markerView.html?id=' + id //iframe的url
+            });
+        } else if (type == "viewfeed") {
+            if ($(that).attr("attr") == 0) {
+                $.ajax({
+                    url: "/api/FeedbackAction",
+                    dataType: "json",
+                    method: "post",
+                    data: {
+                        Id: id, type: "view"
+                    },
+                    success: function (res) {
+                        window.location.reload();
+                    }
+                });
+            }
+
+            layer.open({
+                type: 1,
+                title: '描述详情',
+                shadeClose: true,
+                shade: 0.8,
+                area: ['420px', '240px'],
+                content: "<div style='padding:10px;'>" + detail+"</div>" //iframe的url
             });
         }
     }

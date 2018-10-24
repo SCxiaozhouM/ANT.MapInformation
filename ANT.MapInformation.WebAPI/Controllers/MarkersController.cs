@@ -292,6 +292,7 @@ namespace ANT.MapInformation.WebAPI.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Markers/ListInfo")]
+        [JsonNetActionFilter]
         public IHttpActionResult MarkersListInfo([FromBody]JObject objModel)
         {
             NewPageModel pagemodel   = new NewPageModel();

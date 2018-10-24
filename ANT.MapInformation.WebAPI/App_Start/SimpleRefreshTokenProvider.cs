@@ -17,7 +17,7 @@ namespace ANT.MapInformation.WebAPI.App_Start
         public override void Create(AuthenticationTokenCreateContext context)
         {
             context.Ticket.Properties.IssuedUtc = DateTime.UtcNow;
-            context.Ticket.Properties.ExpiresUtc = DateTime.UtcNow.AddDays(60);
+            context.Ticket.Properties.ExpiresUtc = DateTime.UtcNow.AddHours(12);
             context.SetToken(Guid.NewGuid().ToString("n"));
             _refreshTokens[context.Token] = context.SerializeTicket();
         }

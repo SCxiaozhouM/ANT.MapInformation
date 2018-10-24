@@ -15,6 +15,7 @@ namespace ANT.MapInformation.WebAPI
             //有关如何配置应用程序的详细信息
             ConfigAuth(app);
             HttpConfiguration config = new HttpConfiguration();
+            //config.Filters.Add(new JsonNetActionFilterAttribute());
             WebApiConfig.Register(config);
             app.UseCors(CorsOptions.AllowAll);
             app.UseWebApi(config);
@@ -30,7 +31,7 @@ namespace ANT.MapInformation.WebAPI
                 Provider = new SimpleAuthorizationServerProvider(), //access_token 相关授权服务            RefreshTokenProvider = new SimpleRefreshTokenProvider() //refresh_token 授权服务
                 RefreshTokenProvider = new SimpleRefreshTokenProvider() //refresh_token 授权服务
             };
-
+            
             app.UseOAuthAuthorizationServer(option);
             app.UseOAuthBearerAuthentication(new OAuthBearerAuthenticationOptions());
         }

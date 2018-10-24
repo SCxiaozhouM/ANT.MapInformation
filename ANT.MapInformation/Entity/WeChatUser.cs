@@ -28,6 +28,7 @@ namespace ANT.MapInformation.Entity
 
         public string Gender { get; set; }
         public string PhoneNum { get; set; } = "";
+       
 
         /// <summary>
         /// 地区
