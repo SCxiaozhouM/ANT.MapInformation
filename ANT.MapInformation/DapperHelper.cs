@@ -128,7 +128,6 @@ namespace ANT.MapInformation.Dapper
                 {
                     continue;
                 }
-
                 sb.Append("" + property.Name + "="+"@"+ property.Name+",");
             }
             var strSql = sb.ToString().TrimEnd(',');

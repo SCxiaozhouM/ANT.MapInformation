@@ -26,16 +26,12 @@
             </ul>-->
             <ul class="layui-nav layui-layout-right">
                 <li class="layui-nav-item">
-                    <a href="javascript:;">
-                        <img src="http://t.cn/RCzsdCq" class="layui-nav-img">
-                        贤心
-                    </a>
                     <dl class="layui-nav-child">
                         <dd><a href="">基本资料</a></dd>
                         <dd><a href="">安全设置</a></dd>
                     </dl>
                 </li>
-                <li class="layui-nav-item"><a href="">退了</a></li>
+                <li class="layui-nav-item"><a href="javascript:void(0);" onclick="LogOut()">退了</a></li>
             </ul>
         </div>
 
@@ -81,6 +77,17 @@
 
         function Href(url) {
             $("#myiframe").attr("src", url);
+        }
+        function LogOut() {
+            $.ajax({
+                url: "/user/logout",
+                method: "get",
+                data: {name:"admin"},
+                dataType: "json",
+                success: function () {
+                    window.location.href = "login.html";
+                }
+            })
         }
     </script>
 </body>

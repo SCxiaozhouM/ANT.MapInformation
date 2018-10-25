@@ -21,22 +21,22 @@ namespace ANT.MapInformation.Entity
         /// <summary>
         /// openId
         /// </summary>
-        public string OpenId { get; set; }
+        public string OpenId { get; set; } = "";
 
         /// <summary>
         ///纬度
         /// </summary>
-        public string Latitude { get; set; }
+        public string Latitude { get; set; } = "";
 
         /// <summary>
         /// 经度
         /// </summary>
-        public string Longitude { get; set; }
+        public string Longitude { get; set; } = "";
 
         /// <summary>
         /// 地区名
         /// </summary>
-        public string AreaName { get; set; }
+        public string AreaName { get; set; } = "";
 
         /// <summary>
         /// 是否可以进入
@@ -55,20 +55,20 @@ namespace ANT.MapInformation.Entity
         /// <summary>
         /// 限高
         /// </summary>
-        public string LimitHeight { get; set; }
+        public string LimitHeight { get; set; } = "";
         /// <summary>
         /// 收费标准
         /// </summary>
-        public string ChargingStandard { get; set; }
+        public string ChargingStandard { get; set; } = "";
         /// <summary>
         /// 距离
         /// </summary>
-        public string Distance { get; set; }
+        public string Distance { get; set; } = "";
 
         /// <summary>
         /// 描述
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
         /// <summary>
         /// 封面图片
         /// </summary>
@@ -76,7 +76,7 @@ namespace ANT.MapInformation.Entity
         /// <summary>
         /// 图片
         /// </summary>
-        public string Images { get; set; }
+        public string Images { get; set; } = "";
 
         /// <summary>
         /// 采纳数
@@ -88,8 +88,12 @@ namespace ANT.MapInformation.Entity
         /// </summary>
         public bool IsAnonymity { get; set; }
 
-     
+        /// <summary>
+        /// 状态 0：正常 1：异常 2：更改
+        /// </summary>
+        public int Status { get; set; }
 
-       
+
+
     }
 }

@@ -25,7 +25,7 @@ namespace ANT.MapInformation.WebAPI.App_Start
                 var name = HttpContext.Current.Request.Cookies["name"];
                 if (name == null)
                 {
-                    actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.Unauthorized, new HttpError("未登录"));
+                    actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.OK,new { status="error",code=404});
                 }
             }
         }

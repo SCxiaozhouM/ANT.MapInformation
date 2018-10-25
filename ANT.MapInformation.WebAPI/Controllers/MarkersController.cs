@@ -57,7 +57,7 @@ namespace ANT.MapInformation.WebAPI.Controllers
             double maxlng = lng + dlng;
             //dapper对象
             string sql =
-                "select * from MarkersInformation where latitude>@minlat and latitude<@maxlat and longitude>@minlng and longitude<@maxlng";
+                "select * from MarkersInformation where latitude>@minlat and latitude<@maxlat and longitude>@minlng and longitude<@maxlng and isdel=0 and status=0";
            var list = MarkersDapper.Query(sql, new {minlat, maxlat, minlng, maxlng});
             var modelList = list.Select(o => new MarkersListModel{OpenId=o.OpenId, Latitude =Convert.ToDouble(o.Latitude),Longitude = Convert.ToDouble(o.Longitude) ,Id = o.Id});
             //序列化对象
@@ -201,7 +201,7 @@ namespace ANT.MapInformation.WebAPI.Controllers
             pageModel.PageSize = 6;
 
             pageModel.Search = "%" + pageModel.Search + "%";
-            var modelList = MarkersDapper.Query("select * from (select row_number()over(order by id) as rownumber,* from MarkersInformation where openId=@openId and IsDel=0 and areaName like @search) a " +
+            var modelList = MarkersDapper.Query("select * from (select row_number()over(order by id) as rownumber,* from MarkersInformation where openId=@openId and IsDel=0 and areaName like @search and status in (" + pageModel.State + ")) a " +
                                         "  where rownumber  between @minnum and @maxNum", pageModel).OrderByDescending(o => o.CreateTime); ;
             var count = MarkersDapper.GetCount(" openId=@openId",new { openId=pageModel.OpenId});
             JsonSerializerSettings settings = new JsonSerializerSettings();
@@ -242,14 +242,25 @@ namespace ANT.MapInformation.WebAPI.Controllers
         /// </summary>
         /// <returns></returns>
         [Route("Update/Markers")]
-        [Authorize]
         public HttpResponseMessage UpdateMarkers([FromBody] MarkersInformation model)
         {
+            //查询坐标是否存在
+
+            var markers = MarkersDapper.Query("select * from markersInformation where id=@id", new { id = model.Id }).FirstOrDefault();
+            if(markers==null)
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, new { status = "error" }, Configuration.Formatters.JsonFormatter);
+            }
             model.Images = model.Images.Trim(',');
             var imgs = model.Images.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
             if (imgs.Length > 0)
             {
                 model.CoverImage = imgs[0];
+            }
+            //如果时异常状态，更改后偶则为审核状态
+            if(markers.Status==1)
+            {
+                model.Status = 2;
             }
             MarkersDapper.Update(model);
             HttpResponseMessage result =
@@ -302,7 +313,7 @@ namespace ANT.MapInformation.WebAPI.Controllers
             pagemodel.Start = Convert.ToInt32(objModel["start"]);
             var modelList = MarkersDapper.Query("select * from (select row_number()over(order by id) as rownumber,* from MarkersInformation where  IsDel=0 and areaName like @search) a " +
                                         "  where rownumber  between @minnum and @maxNum", pagemodel).OrderByDescending(o => o.CreateTime).Select(o=>new MarkersModel {
-                                            AcceptNum = o.AcceptNum, CoverImage=o.CoverImage,
+                                            AcceptNum = o.AcceptNum, CoverImage=o.CoverImage,Status=o.Status,
                                          Id=o.Id, AreaName=o.AreaName, CreateTime=o.CreateTime.ToString("yyyy-MM-dd"), Remark=o.Remark, UserName= WechatUserDpper.Query("select NickName from  WechatUser where openId='"+o.OpenId+"'").FirstOrDefault().NickName
                                         });
             var count = MarkersDapper.GetCount(" isdel=0");

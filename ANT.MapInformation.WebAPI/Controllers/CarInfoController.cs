@@ -105,6 +105,18 @@ namespace ANT.MapInformation.WebAPI.Controllers
             pagemodel.Search = "%" + pagemodel.Search + "%";
             var modelList = CarInfoDappler.Query("select * from (select row_number()over(order by id) as rownumber,* from carInfo where  IsDel=0 ) a " +
                                         "  where rownumber  between @minnum and @maxNum", pagemodel).OrderByDescending(o => o.CreateTime);
+            foreach (var model in modelList)
+            {
+                var user = WechatDappler.Query("select * from wechatUser where isdel=0 and openid=@openId", new { openId = model.OpenId }).FirstOrDefault();
+                if(user!=null)
+                {
+                    model.OpenId = user.NickName;
+                }
+                else
+                {
+                    model.OpenId = "";
+                }
+            }
             var count = CarInfoDappler.GetCount();
             JsonSerializerSettings settings = new JsonSerializerSettings();
             settings.ContractResolver = new CamelCasePropertyNamesContractResolver();

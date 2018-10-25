@@ -1,6 +1,27 @@
-﻿body {
+﻿
+.div_kuai {
+    color: #fff;
+    margin: 0 auto;
+    /* margin: 23px; */
+    width: 50%;
+    margin-top: 51px;
 }
-
-.div_kuai{
-   color:#fff;
+.login {
+    display: inline-block;
+    margin-left: 38%;
+    margin-top: 23px;
+    background: #282b33;
+    padding: 5px 10px;
+}
+#bg {
+    border: 10px solid hsla(0,0%,90%,.5);
+    background: #393d49;
+    background-clip: padding-box;
+    width: 500px;
+    height: 300px;
+    margin:0px auto;
+    margin-top:10%
+}
+h1 {
+    text-align: center;
 }

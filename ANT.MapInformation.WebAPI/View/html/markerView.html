@@ -86,10 +86,14 @@
                 </div>
             </div>
             <div class="layui-form-item">
-                <label class="layui-form-label">描述</label>
+                <label class="layui-form-label">图片</label>
                 <div class="layui-input-block" v-for="item in dataInfo.images" style="display:inline-block;margin-left:10px;">
                     <img :src="item" style="height: 150px;" @click="viewImg" />
                 </div>
+            </div>
+            <div style="width:150px;margin: 0px auto; margin-top:20px;margin-bottom:20px;" v-if="dataInfo.status==2">
+                <button class="layui-btn layui-btn-normal" @click="checkClick" status="0">通过</button>
+                <button class="layui-btn layui-btn-danger" @click="checkClick" status="1">拒绝</button>
             </div>
         </form>
     </div>
@@ -115,12 +119,14 @@
 
             });
             this.get();
+            $("input").attr("disabled", "disabled")
+            $("textarea").attr("disabled", "disabled")
         },
         methods: {
             get: function () {
                 $.ajax({
                     url: "/api/markers",
-                    methods: "get",
+                    method: "get",
                     data: { id: getUrlParam("id") },
                     dataType: "json",
                     success: function (res) {
@@ -129,6 +135,18 @@
                     }
                 });
 
+            },
+            checkClick: function (e) {
+                vm.dataInfo.status = $(e.target).attr("status");
+                $.ajax({
+                    url: "/Update/Markers",
+                    method:"post",
+                    data: vm.dataInfo,
+                    dataType: "json",
+                    success: function (res) {
+                        layer.closeAll()
+                    }
+                });
             },
             viewImg: function (e) {
                 var img = $(e.target).attr("src");

@@ -8,31 +8,46 @@
     <script src="../js/jquery-3.2.1.min.js"></script>
     <link href="../css/Login.css" rel="stylesheet" />
 </head>
-<body style="background:#152a5f">
-    <form class="div_kuai" id="form1">
-        <h1>后台管理</h1>
-        <div>
-            账户：<input type="text" name="username"/>
-        </div>
-        <div>
-            密码：<input type="text" name="password"/>
-        </div>
-        <div>
-            <div onclick="Login()">登陆</div>
-        </div>
-    </form>
+<body style="background:#282b33">
+    <div id="bg">
+        <form class="div_kuai" id="form1">
+            <h1>后台管理</h1>
+            <div>
+                账户：<input type="text" name="username" />
+            </div>
+            <div>
+                密码：<input type="text" name="password" />
+            </div>
+            <div>
+                <div class="login" onclick="Login()">登陆</div>
+            </div>
+        </form>
+    </div>
+
+
 </body>
 </html>
+<script src="../js/layer/layer.js"></script>
 <script>
     function Login() {
         var data = $("#form1").serializeArray();
+        for (var i = 0; i < data.length; i++) {
+            if (data[i].value == "") {
+                layer.msg("请填写完信息！")
+                return;
+            }
+        }
         $.ajax({
             url: "/user/login",
             data: data,
             dataType: "json",
             method: "post",
             success: function (res) {
-                window.location.href='main.html'
+                if (res.status == "OK") {
+                    window.location.href = 'main.html'
+                } else {
+                    layer.msg("账号或密码错误!")
+                }
             }
         });
     }

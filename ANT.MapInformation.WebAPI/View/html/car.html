@@ -60,7 +60,12 @@
                 type: "post",
                 data: {
                     pageCount: 1
-                },
+                }, dataSrc: function (json) {
+                    if (json.status == "error" && json.code == 404) {
+                        window.top.location.href = "login.html"
+                    }
+                    return json.aData;
+                }
 
             },
             lengthMenu: [5, 10, 20, 30],//这里也可以设置分页，但是不能设置具体内容，只能是一维或二维数组的方式，所以推荐下面language里面的写法。

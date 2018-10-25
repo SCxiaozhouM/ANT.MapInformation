@@ -53,9 +53,12 @@ namespace ANT.MapInformation.WebAPI.Controllers
         }
         [JsonNetActionFilter]
         [HttpGet]
+        [Route("user/logout")]
         public IHttpActionResult LogOut(string name)
         {
-            var cooike = new HttpCookie("name", null);
+            var aCookie = new HttpCookie("name");
+            aCookie.Expires = DateTime.Now.AddDays(-1);
+            HttpContext.Current.Response.Cookies.Add(aCookie);
             return Json(new { status = "OK"});
         }
         /// <summary>

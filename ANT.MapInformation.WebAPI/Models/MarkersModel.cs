@@ -14,6 +14,7 @@ namespace ANT.MapInformation.WebAPI.Models
         public string Remark { get; set; }
         public long AcceptNum { get; set; }
         public string CreateTime { get; set; }
-       
+        public int Status { get; set; }
+
     }
 }

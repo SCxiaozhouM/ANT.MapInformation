@@ -24,6 +24,7 @@
                 <th>图片</th>
                 <th>描述</th>
                 <th>点赞数</th>
+                <th>状态</th>
                 <th>时间</th>
                 <th>操作</th>
             </tr>
@@ -60,7 +61,13 @@
                 },
                 data: {
                     pageCount: 1
+                }, dataSrc: function (json) {
+                    if (json.status == "error" && json.code == 404) {
+                        window.top.location.href="login.html"
+                    }
+                    return json.aData;
                 }
+               
             },
             lengthMenu: [5, 10, 20, 30],//这里也可以设置分页，但是不能设置具体内容，只能是一维或二维数组的方式，所以推荐下面language里面的写法。
             columns: [//data 匹配的字段 class class样式  render:可以返回自定义的标签
@@ -81,13 +88,26 @@
                     "data": "acceptNum", "sWidth": "5%", "class": "text-center"
                 },
                 {
+                    "data": "status", "sWidth": "5%", "class": "text-center","render": function (data, type, full) {
+                        var str = "";
+                        if (data == 0) {
+                            str = "正常"
+                        } else if (data == 1) {
+                            str = "异常"
+                        } else if (data == 2){
+                            str = "待审核"
+                        }
+                        return str;
+                    }
+                },
+                {
                     "data": "createTime", "sWidth": "10%", "class": "text-center"
                 },
                 {
                     "data": "id",
                     "class": "caozuo text-center",
                     "render": function (data, type, full) {
-                        return "<span onclick='operate(this)' type='view' id='" + data + "'>查看</span>&nbsp;&nbsp;&nbsp;<span onclick='operate(this)'  type='del' id='" + data + "'>删除</span>";
+                        return "<span onclick='operate(this)' type='view' id='" + data + "'>" + (full.status==2?"审核":"查看") + "</span>&nbsp;&nbsp;&nbsp;<span onclick='operate(this)'  type='del' id='" + data + "'>删除</span>";
                     }, "sWidth": "10%"
                 },
             ],

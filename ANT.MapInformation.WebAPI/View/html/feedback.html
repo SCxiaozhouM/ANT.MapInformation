@@ -36,7 +36,7 @@
 <script src="../js/DataTables/js/jquery.js"></script>
 <script src="../js/DataTables/js/jquery.dataTables.js"></script>
 <script>
-    let detail;
+    let dataInfo;
     $(document).ready(function () {
         $("#table_local").dataTable({
             "bPaginate": true,//分页工具条显示
@@ -58,7 +58,13 @@
                 type: "post",
                 data: {
                     pageCount: 1
-                },
+                }, dataSrc: function (json) {
+                    if (json.status == "error" && json.code == 404) {
+                        window.top.location.href = "login.html"
+                    }
+                    dataInfo = json.aData;
+                    return json.aData;
+                }
                 
             },
             lengthMenu: [5, 10, 20, 30],//这里也可以设置分页，但是不能设置具体内容，只能是一维或二维数组的方式，所以推荐下面language里面的写法。
@@ -96,7 +102,7 @@
                     "data": "markersId",
                     "class": "caozuo text-center",
                     "render": function (data, type, full) {
-                        return "<span onclick='operate(this)' type='viewfeed' id='" + full.id + "' attr='" + full.status + "'>查看</span><span onclick='operate(this)' type='view' id='" + data + "'>详情</span><span onclick='operate(this)'  type='del' id='" + full.id + "'>删除</span>";
+                        return "<span onclick='operate(this)' type='viewfeed' id='" + full.id + "' attr='" + full.status + "'>查看</span><span onclick='operate(this)' type='view' id='" + data + "'>详情</span>";
                     }, "sWidth": "10%"
                 },
             ],
@@ -127,13 +133,13 @@
 
         });
     });
-    function selectChange() {
+    function selectChange(that) {
         $.ajax({
             url: "/api/FeedbackAction",
             dataType: "json",
             method: "post",
             data: {
-                Id: $("#selectId").attr("attr"), type: $("#selectId").val()
+                Id: $(that).attr("attr"), type: $(that).val()
             },
                 success: function (res) {
                 window.location.reload();
@@ -186,15 +192,20 @@
                     }
                 });
             }
+           
+            for (var i = 0; i < dataInfo.length; i++) {
+                if (dataInfo[i].id == id) {
+                    layer.open({
+                        type: 1,
+                        title: '描述详情',
+                        shadeClose: true,
+                        shade: 0.8,
+                        area: ['420px', '240px'],
+                        content: "<div style='padding:10px;'>" + dataInfo[i].detail + "</div>" //iframe的url
+                    });
+                }
+            }
             
-            layer.open({
-                type: 1,
-                title: '描述详情',
-                shadeClose: true,
-                shade: 0.8,
-                area: ['420px', '240px'],
-                content: "<div style='padding:10px;'>" + detail+"</div>" //iframe的url
-            });
         }
     }
 </script>
