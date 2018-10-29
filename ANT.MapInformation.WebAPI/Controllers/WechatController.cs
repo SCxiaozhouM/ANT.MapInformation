@@ -20,12 +20,12 @@ namespace ANT.MapInformation.WebAPI.Controllers
         /// <summary>
         /// appid
         /// </summary>
-        public static string AppId = "wx78315f71a2589d92";
+        public static string AppId = "wxb55e0389a2a5498f";
 
         /// <summary>
         /// secret
         /// </summary>
-        public static string Secret = "90f1ccbc2435d835544508bde9cde78c";
+        public static string Secret = "3bacad0dd17162a0ba5146919a5839cb";
         
 
 
@@ -54,20 +54,18 @@ namespace ANT.MapInformation.WebAPI.Controllers
         /// <param name="code"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("api/Wechat/getOpenId")]
         public HttpResponseMessage GetOpenId(string code)
         {
             if (string.IsNullOrEmpty(code))
             {
-                return Request.CreateResponse(HttpStatusCode.OK, new { status = "error", error="code参数错误" }, Configuration.Formatters.JsonFormatter);
-                 
+                return Request.CreateResponse(HttpStatusCode.OK, new { status = "error", error = "code参数错误" }, Configuration.Formatters.JsonFormatter);
             }
             var responseStr = GetHttpRequest(
-                "https://api.weixin.qq.com/sns/jscode2session?appid="+ AppId + "&secret="+ Secret + "&js_code="+ code + "&grant_type=authorization_code",
+                "https://api.weixin.qq.com/sns/jscode2session?appid=" + AppId + "&secret=" + Secret + "&js_code=" + code + "&grant_type=authorization_code",
                 "GET");
             var obj = JsonConvert.DeserializeObject<OpenIdModel>(responseStr);
             //查询是否存在
-            obj.IsExist = WechatDapper.GetCount(" openId=@openId ", obj)==1;
+                obj.IsExist = WechatDapper.GetCount(" openId=@openId ", obj) == 1;
             HttpResponseMessage result =
                 Request.CreateResponse(HttpStatusCode.OK, new { status = "OK", data = obj }, Configuration.Formatters.JsonFormatter);
             return result;

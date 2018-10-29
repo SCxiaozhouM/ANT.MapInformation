@@ -155,7 +155,9 @@ namespace ANT.MapInformation.WebAPI.Controllers
             string[] files = url.Split(new char[]{ ',' },StringSplitOptions.RemoveEmptyEntries);
             foreach (var file in files)
             {
-                File.Delete(HttpContext.Current.Server.MapPath(file));
+                var filea = file.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+                var path =  "/" + filea[filea.Length - 2] + "/" + filea[filea.Length - 1];
+                File.Delete(HttpContext.Current.Server.MapPath(path));
             }
             HttpResponseMessage result =
                 Request.CreateResponse(HttpStatusCode.OK, new { status = "OK" }, Configuration.Formatters.JsonFormatter);
@@ -253,6 +255,12 @@ namespace ANT.MapInformation.WebAPI.Controllers
             }
             model.Images = model.Images.Trim(',');
             var imgs = model.Images.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            for (int i = 0; i < imgs.Length; i++)
+            {
+                var imga = imgs[i].Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+                imgs[i] = "/"+imga[imga.Length-2]+ "/" + imga[imga.Length - 1];
+            }
+            model.Images = string.Join(",", imgs);
             if (imgs.Length > 0)
             {
                 model.CoverImage = imgs[0];

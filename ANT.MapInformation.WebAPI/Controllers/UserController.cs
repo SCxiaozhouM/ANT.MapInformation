@@ -41,7 +41,7 @@ namespace ANT.MapInformation.WebAPI.Controllers
                     dic.Add("grant_type", "password");
                     dic.Add("username",model.UserName);
                     dic.Add("password",model.Password);
-                    var responseStr = CreatePostHttpResponse("http://"+Url.Request.Headers.Host+"/token", dic);
+                    var responseStr = CreatePostHttpResponse(HttpContext.Current.Request.Url.Scheme+"://"+Url.Request.Headers.Host+"/token", dic);
                     var obj = JsonConvert.DeserializeObject<JObject>(responseStr);
                     var cooike = new HttpCookie("name", obj["access_token"].ToString());
                     HttpContext.Current.Response.AppendCookie(cooike);

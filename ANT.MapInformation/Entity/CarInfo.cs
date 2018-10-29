@@ -57,9 +57,23 @@ namespace ANT.MapInformation.Entity
             get; set;
         }
         /// <summary>
+        /// 长
+        /// </summary>
+        public string Height
+        {
+            get; set;
+        }
+        /// <summary>
         /// 宽
         /// </summary>
-        public string WidthHeight
+        public string Width
+        {
+            get; set;
+        }
+        /// <summary>
+        /// 高
+        /// </summary>
+        public string Tall
         {
             get; set;
         }

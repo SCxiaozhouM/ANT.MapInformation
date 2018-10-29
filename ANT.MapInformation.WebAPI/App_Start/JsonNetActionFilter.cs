@@ -20,14 +20,14 @@ namespace ANT.MapInformation.WebAPI.App_Start
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
             
-           if (actionContext.ActionDescriptor.ActionName!="Login")
-            {
-                var name = HttpContext.Current.Request.Cookies["name"];
-                if (name == null)
-                {
-                    actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.OK,new { status="error",code=404});
-                }
-            }
+           //if (actionContext.ActionDescriptor.ActionName!="Login")
+           // {
+           //     var name = HttpContext.Current.Request.Cookies["name"];
+           //     if (name == null)
+           //     {
+           //         actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.OK,new { status="error",code=404});
+           //     }
+           // }
         }
     }
 }
